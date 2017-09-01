@@ -26,7 +26,7 @@ ObfuscateR <- R6Class(
     names(private$last.names) <- c("name", "perc", "cum.perc", "rank")
     
     #set dictionary exceptions
-    private$exceptions <-read.csv("exceptions.txt")
+    private$exceptions <-read.table("exceptions.txt",stringsAsFactors = F)$V1    
     
  
     ##remove exceptions from dictionaries
