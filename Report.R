@@ -146,7 +146,7 @@ Report <- R6Class(
           "Sample Patient Age Over Max Instances:"
         ))
         self$NL()
-        for (i in 1:nrow(head(private$patientAgeOverMax, n = 100))) {
+        for (i in 1:nrow(head(private$patientAgeOverMax, n = private$reportParams$instancesToShow))) {
           row <- private$patientAgeOverMax[i, ]
           writeLines(paste0(
             "Row:",
@@ -173,7 +173,7 @@ Report <- R6Class(
           "Sample Zip Code Instances:"
         ))
         self$NL()
-        for (i in 1:nrow(head(private$validatedZipCodes, n = 100))) {
+        for (i in 1:nrow(head(private$validatedZipCodes, n = private$reportParams$instancesToShow))) {
           row <- private$validatedZipCodes[i, ]
           writeLines(paste0(
             "Row:",
@@ -197,7 +197,7 @@ Report <- R6Class(
           "Sample Patient Draw Date Instances:"
         ))
         self$NL()
-        for (i in 1:nrow(head(private$validPatDrawDates, n = 100))) {
+        for (i in 1:nrow(head(private$validPatDrawDates, n = private$reportParams$instancesToShow))) {
           row <- private$validPatDrawDates[i, ]
           writeLines(
             paste0(
