@@ -65,9 +65,18 @@ Report <- R6Class(
       private$validPatDrawDates <-
         private$rdata$validPatientDrawDates()
       
+      private$surgicalNumbers$obfuscatedtext<-NA
       
       
       
+      for(i in 1:nrow(private$surgicalNumbers)) {
+        
+        
+        obfo<-private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('SURGICAL #', private$surgicalNumbers[i,"resultmessage"]))
+        private$surgicalNumbers[i,"obfuscatedtext"]<-obfo
+        
+      }
+      #print(private$surgicalNumbers$obfuscatedtext)
     }
     ,
     NL = function() {
@@ -158,7 +167,7 @@ Report <- R6Class(
       
       p<-private
       o<-p$obfuscateR
-
+      
       
       self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, 'PATIENT ID')
       
@@ -170,7 +179,7 @@ Report <- R6Class(
       
       
       self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
-    
+      
       self$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
       
       self$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )
