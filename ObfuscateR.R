@@ -1,7 +1,7 @@
 library(tm)
 
 
-
+#dictionary code taken from from http://bit.ly/2wgkBpv
 
 ObfuscateR <- R6Class(
   "ObfuscateR",
