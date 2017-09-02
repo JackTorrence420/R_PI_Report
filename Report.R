@@ -47,6 +47,7 @@ Report <- R6Class(
       }
       
       
+      
       private$reportParams = reportParams
       private$rdata = Data$new(dataFile = private$reportParams$dataFile)
       private$obfuscateR= ObfuscateR$new(private$reportParams)
@@ -65,16 +66,47 @@ Report <- R6Class(
       private$validPatDrawDates <-
         private$rdata$validPatientDrawDates()
       
-      private$surgicalNumbers$obfuscatedtext<-NA
-
-      for(i in 1:nrow(private$surgicalNumbers)) {
-      private$surgicalNumbers[i,"obfuscatedtext"]<-
-        private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('SURGICAL #', private$surgicalNumbers[i,"resultmessage"]))
       
+      
+      if(nrow(private$surgicalNumbers)>0){
+        private$surgicalNumbers$obfuscatedtext<-NA
+        for(i in 1:nrow(private$surgicalNumbers)) {
+          private$surgicalNumbers[i,"obfuscatedtext"]<-
+            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('SURGICAL #', private$surgicalNumbers[i,"resultmessage"]))
+          
+        }
       }
-    
-     # print(head(self$getSurgicalNumbers()[,c("rownumber","obfuscatedtext")],n=500))
-      #print(private$surgicalNumbers$obfuscatedtext)
+      if(nrow(private$patientIdentifiers)>0){
+        private$patientIdentifiers$obfuscatedtext<-NA
+        for(i in 1:nrow(private$patientIdentifiers)) {
+          private$patientIdentifiers[i,"obfuscatedtext"]<-
+            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('PATIENT ID', private$patientIdentifiers[i,"resultmessage"]))
+          
+        }
+      }
+      
+      if(nrow(private$patientNameChanges)>0){
+        private$patientNameChanges$obfuscatedtext<-NA
+        for(i in 1:nrow(private$patientNameChanges)) {
+          private$patientNameChanges[i,"obfuscatedtext"]<-
+            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('name changed', private$patientNameChanges[i,"resultmessage"]))
+          
+        }
+      }
+      
+      
+      
+      if(nrow(private$patientDateOfBirth)>0){
+        private$patientDateOfBirth$obfuscatedtext<-NA
+        for(i in 1:nrow(private$patientDateOfBirth)) {
+          private$patientDateOfBirth[i,"obfuscatedtext"]<-
+            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('date of birth', private$patientDateOfBirth[i,"resultmessage"]))
+          
+        }
+      }
+      
+      
+      
     }
     ,
     NL = function() {
@@ -105,20 +137,19 @@ Report <- R6Class(
     ,
     ShowTotalsdt=function(){
       
-      return(data.table(Title = c("Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:","Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
-                      Counts = c(nrow(private$patientIdentifiers),
-                                 nrow(private$surgicalNumbers),
-                                 nrow(private$patientNameChanges),
-                                 nrow(private$patientAgeOverMax),
-                                 nrow(private$patientDateOfBirth),
-                                 nrow(private$validatedZipCodes),
-                                 nrow(private$validPatDrawDates)
-                                      
-                     )  ))
-      
+      return(data.table(Title = c("Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:"
+                                  ,"Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
+                        Counts = c(nrow(private$patientIdentifiers),
+                                   nrow(private$surgicalNumbers),
+                                   nrow(private$patientNameChanges),
+                                   nrow(private$patientAgeOverMax),
+                                   nrow(private$patientDateOfBirth),
+                                   nrow(private$validatedZipCodes),
+                                   nrow(private$validPatDrawDates)
+                        )  
+      )
+      )
     }
-    
-    
     
     
     ,
@@ -128,11 +159,37 @@ Report <- R6Class(
       return(private$validPatDrawDates)
     },
     
+    getValidZipCodes=function(){
+      
+      return(private$validatedZipCodes)
+    },
+    
+    getPatAgeOverMax=function(){
+      
+      return(private$patientAgeOverMax)
+    },
     
     getSurgicalNumbers=function(){
       
       return(private$surgicalNumbers)
     },
+    
+    getPatientIdentifiers=function(){
+      
+      return(private$patientIdentifiers)
+    },
+    
+    
+    getNameChanges=function(){
+      
+      return(private$patientNameChanges)
+    },
+    
+    getpatientDateOfBirth=function(){
+      
+      return(private$patientDateOfBirth)
+    },
+    
     
     
     printStringSearchInstances= function(title,instanceCollection, searchString){
@@ -189,7 +246,7 @@ Report <- R6Class(
       
       p<-private
       o<-p$obfuscateR
-
+      
       
       self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, 'PATIENT ID')
       
@@ -201,7 +258,7 @@ Report <- R6Class(
       
       
       self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
-    
+      
       self$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
       
       self$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )
