@@ -52,6 +52,8 @@ Report <- R6Class(
       private$rdata = Data$new(dataFile = private$reportParams$dataFile)
       private$obfuscateR= ObfuscateR$new(private$reportParams)
       
+      
+      #populate collections
       private$patientAgeOverMax <- private$rdata$overMaxAge()
       private$patientIdentifiers <-
         private$rdata$searchBlobColumn(private$PATIENT_ID_PATTERN)
@@ -87,6 +89,7 @@ Report <- R6Class(
     }
     
     ,
+    #print text titles for simple report
     printTitle = function() {
       writeLines(paste0("Data Source File:      ","\t\t", basename(reportParams$dataFile)))
       writeLines(paste0("Rows in Dataset:       ","\t\t", private$rdata$totalRows()))
@@ -94,6 +97,7 @@ Report <- R6Class(
     }
     #
     ,
+    #print text totals for simple report
     printTotals = function() {
       writeLines("Found PHI Totals:")
      
@@ -128,7 +132,7 @@ Report <- R6Class(
     
 
     ,
-    
+    #these functions provide  data to the krittr based reports
     getPatDates=function(){
       
       colnames(private$validPatDrawDates)[colnames(private$validPatDrawDates)=="patientdrawdate"] <- "patient draw date"
@@ -170,7 +174,8 @@ Report <- R6Class(
     },
     
     
-    
+    #TODO Obfuscation already applied to collection. Simplify this function
+    #For simple report print out lines for obfuscated string search based collections
     printStringSearchInstances= function(title,instanceCollection, searchString){
       
       p<-private
@@ -186,6 +191,7 @@ Report <- R6Class(
       self$NL()
     }
     ,
+    #For simple Report. Print lines to represent non string search field counts
     printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
       
       self$NL()
@@ -269,6 +275,7 @@ Report <- R6Class(
       writeLines(paste0(instancename, "\t\t", nrow(instance)))
     },
     
+    #prepare collection  for report by removing names and digits from resultmessage field
     obfuscateCollection=function(collection, pattern){
       if(nrow(collection)>0){
         collection["obfuscatedtext"]<-NA
