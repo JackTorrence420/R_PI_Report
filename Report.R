@@ -69,44 +69,48 @@ Report <- R6Class(
       
       
       if(nrow(private$surgicalNumbers)>0){
-        private$surgicalNumbers$obfuscatedtext<-NA
-        for(i in 1:nrow(private$surgicalNumbers)) {
-          private$surgicalNumbers[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('SURGICAL #', private$surgicalNumbers[i,"resultmessage"]))
-          
-        }
+      private$surgicalNumbers$obfuscatedtext<-NA
+      for(i in 1:nrow(private$surgicalNumbers)) {
+      private$surgicalNumbers[i,"obfuscatedtext"]<-
+        private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('SURGICAL #', private$surgicalNumbers[i,"resultmessage"]))
+      
+      }
       }
       if(nrow(private$patientIdentifiers)>0){
-        private$patientIdentifiers$obfuscatedtext<-NA
-        for(i in 1:nrow(private$patientIdentifiers)) {
-          private$patientIdentifiers[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('PATIENT ID', private$patientIdentifiers[i,"resultmessage"]))
-          
-        }
+      private$patientIdentifiers$obfuscatedtext<-NA
+      for(i in 1:nrow(private$patientIdentifiers)) {
+        
+       
+        private$patientIdentifiers[i,"obfuscatedtext"]<-
+          private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('PATIENT ID', private$patientIdentifiers[i,"resultmessage"]))
+        
+                                          }
       }
-      
       if(nrow(private$patientNameChanges)>0){
-        private$patientNameChanges$obfuscatedtext<-NA
-        for(i in 1:nrow(private$patientNameChanges)) {
-          private$patientNameChanges[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('name changed', private$patientNameChanges[i,"resultmessage"]))
-          
-        }
+        
+
+      private$patientNameChanges$obfuscatedtext<-NA
+      for(i in 1:nrow(private$patientNameChanges)) {
+        
+        private$patientNameChanges[i,"obfuscatedtext"]<-
+          private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('name changed', private$patientNameChanges[i,"resultmessage"]))
+       
       }
       
+      }
       
-      
+    
       if(nrow(private$patientDateOfBirth)>0){
-        private$patientDateOfBirth$obfuscatedtext<-NA
-        for(i in 1:nrow(private$patientDateOfBirth)) {
-          private$patientDateOfBirth[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('date of birth', private$patientDateOfBirth[i,"resultmessage"]))
-          
-        }
-      }
+      private$patientDateOfBirth$obfuscatedtext<-NA
+      for(i in 1:nrow(private$patientDateOfBirth)) {
+        private$patientDateOfBirth[i,"obfuscatedtext"]<-
+          private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern('date of birth', private$patientDateOfBirth[i,"resultmessage"]))
+        
+                                                  }
+                                            }
       
-      
-      
+    
+    
     }
     ,
     NL = function() {
@@ -137,34 +141,38 @@ Report <- R6Class(
     ,
     ShowTotalsdt=function(){
       
-      return(data.table(Title = c("Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:"
+      return(data.table("type of PHI infraction" = c("Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:"
                                   ,"Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
-                        Counts = c(nrow(private$patientIdentifiers),
-                                   nrow(private$surgicalNumbers),
-                                   nrow(private$patientNameChanges),
-                                   nrow(private$patientAgeOverMax),
-                                   nrow(private$patientDateOfBirth),
-                                   nrow(private$validatedZipCodes),
-                                   nrow(private$validPatDrawDates)
-                        )  
-      )
-      )
+                      "number of instances in dataset" = c(nrow(private$patientIdentifiers),
+                                 nrow(private$surgicalNumbers),
+                                 nrow(private$patientNameChanges),
+                                 nrow(private$patientAgeOverMax),
+                                 nrow(private$patientDateOfBirth),
+                                 nrow(private$validatedZipCodes),
+                                 nrow(private$validPatDrawDates)
+                                )  
+                      )
+            )
     }
     
-    
+
     ,
     
     getPatDates=function(){
       
+      colnames(private$validPatDrawDates)[colnames(private$validPatDrawDates)=="patientdrawdate"] <- "patient draw date"
       return(private$validPatDrawDates)
     },
     
     getValidZipCodes=function(){
       
+      colnames(private$validatedZipCodes)[colnames(private$validatedZipCodes)=="cleanzipcodes"] <- "patient address postal code"
+      
       return(private$validatedZipCodes)
     },
     
     getPatAgeOverMax=function(){
+      colnames(private$patientAgeOverMax)[colnames(private$patientAgeOverMax)=="patientage"] <- "patient age over max"
       
       return(private$patientAgeOverMax)
     },
@@ -246,7 +254,7 @@ Report <- R6Class(
       
       p<-private
       o<-p$obfuscateR
-      
+
       
       self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, 'PATIENT ID')
       
@@ -258,7 +266,7 @@ Report <- R6Class(
       
       
       self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
-      
+    
       self$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
       
       self$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )

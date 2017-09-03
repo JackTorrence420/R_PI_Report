@@ -76,8 +76,14 @@ ObfuscateR <- R6Class(
   
  extractStringUsingPattern= function(pattern, text){
     
-    pos = regexpr(pattern, text)
+ 
+   
+   
+   
+   pos = regexpr(pattern, text)
     rowchar <- as.character(text)
+    
+   
     
     for (i in 1:private$reportParams$extractedTextLength)
       rowchar <- paste0(rowchar, ' ')
@@ -85,8 +91,10 @@ ObfuscateR <- R6Class(
     #extract text from start of identifier
     rowchar <-
       substr(rowchar, as.integer(pos[1]), as.integer(pos[1]) + private$reportParams$extractedTextLength)
+   
     
-    return (rowchar)
+  
+    return (tolower(rowchar))
   }
   ,
   
@@ -96,7 +104,16 @@ ObfuscateR <- R6Class(
     
     for (RO in unlist(possibleEntities)[!(unlist(possibleEntities) %in% stopwords("en"))])
     {
-      text <- gsub(paste0('\\<', RO, '\\>'), '#', text)
+      replaceMentString<-"";
+      numchars<-nchar(RO)
+     
+      for (i in 1:numchars){
+        replaceMentString<-paste0(replaceMentString,"#")
+      }
+      
+     # text <- gsub(paste0('\\<', RO, '\\>'), '#', text)  
+      
+      text <- gsub(paste0('\\<', RO, '\\>'), replaceMentString, text)
       
     }
     #obfuscate all number

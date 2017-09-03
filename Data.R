@@ -18,11 +18,17 @@ Data <- R6Class(
       #populate dataframe
       private$documentDf <- read.csv(dataFile)
       
+      
+      
+      
       #add RowNumber
       private$addRowNumber()
       
       #normalize ColNames
       private$normalizeColumnNames()
+      
+      #replace symbols that cause formatting errors for report
+      private$replaceProblematicSymbols()
       
       #normalize postal codes columns
       private$normalizePostalCodeColumns()
@@ -95,6 +101,11 @@ Data <- R6Class(
       
       
     },
+    
+    replaceProblematicSymbols=function(){
+      private$documentDf$resultmessage <- gsub('-', '_', private$documentDf$resultmessage)
+    },
+    
     normalizeColumnNames = function() {
       ## set column names to lowercase
       names(private$documentDf) <-
