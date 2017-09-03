@@ -54,28 +54,28 @@ Report <- R6Class(
       
       private$patientAgeOverMax <- private$rdata$overMaxAge()
       private$patientIdentifiers <-
-        private$rdata$searchBlobColumn('PATIENT ID')
+        private$rdata$searchBlobColumn(private$PATIENT_ID_PATTERN)
       
       private$surgicalNumbers <-
-        private$rdata$searchBlobColumn('SURGICAL #')
+        private$rdata$searchBlobColumn(private$SURGICAL_NUMBER_PATTERN)
       private$patientNameChanges <-
-        private$rdata$searchBlobColumn('name changed')
+        private$rdata$searchBlobColumn(private$NAME_CHANGED_PATTERN)
       private$patientDateOfBirth <-
-        private$rdata$searchBlobColumn('date of birth')
+        private$rdata$searchBlobColumn(private$DATE_OF_BIRTH_PATTERN)
       private$validatedZipCodes <- private$rdata$validZipCodes()
       private$validPatDrawDates <-
         private$rdata$validPatientDrawDates()
       
       
-      
+      #prepare collections for reporting
     
-      private$surgicalNumbers<-private$obfuscateCollection(private$surgicalNumbers,'SURGICAL #')
+      private$surgicalNumbers<-private$obfuscateCollection(private$surgicalNumbers,private$SURGICAL_NUMBER_PATTERN)
       
-      private$patientIdentifiers<-private$obfuscateCollection(private$patientIdentifiers,'PATIENT ID')
+      private$patientIdentifiers<-private$obfuscateCollection(private$patientIdentifiers,private$PATIENT_ID_PATTERN)
       
-      private$patientNameChanges<-private$obfuscateCollection(private$patientNameChanges,'name changed')
+      private$patientNameChanges<-private$obfuscateCollection(private$patientNameChanges,private$NAME_CHANGED_PATTERN)
       
-      private$patientDateOfBirth<-private$obfuscateCollection(private$patientDateOfBirth,'date of birth')
+      private$patientDateOfBirth<-private$obfuscateCollection(private$patientDateOfBirth,private$DATE_OF_BIRTH_PATTERN)
       
       
 
@@ -227,13 +227,13 @@ Report <- R6Class(
       o<-p$obfuscateR
 
       
-      self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, 'PATIENT ID')
+      self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
       
-      self$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, 'name changed')
+      self$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
       
-      self$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, 'SURGICAL #')
+      self$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
       
-      self$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, 'date of birth')
+      self$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
       
       
       self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
@@ -259,6 +259,10 @@ Report <- R6Class(
     patientDateOfBirth = NULL,
     validatedZipCodes = NULL,
     validPatDrawDates = NULL,
+    PATIENT_ID_PATTERN = 'PATIENT ID',
+    NAME_CHANGED_PATTERN = 'name changed',
+    SURGICAL_NUMBER_PATTERN = 'SURGICAL #',
+    DATE_OF_BIRTH_PATTERN = 'date of birth',
     
     printLength = function(instancename, instance)
     {

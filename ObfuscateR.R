@@ -110,9 +110,7 @@ ObfuscateR <- R6Class(
       for (i in 1:numchars){
         replaceMentString<-paste0(replaceMentString,"#")
       }
-      
-     # text <- gsub(paste0('\\<', RO, '\\>'), '#', text)  
-      
+    
       text <- gsub(paste0('\\<', RO, '\\>'), replaceMentString, text)
       
     }
