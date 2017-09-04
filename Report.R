@@ -9,19 +9,18 @@ source("ObfuscateR.r")
 ReportParameters <- R6Class(
   "ReportParameters",
   public = list(
-    showOriginal = FALSE,
-    extractedTextLength = 200L,
-    instancesToShow = 100L,
-    dataFile = "",
+    showOriginal=FALSE,
+    extractedTextLength=0,
+    instancesToShow=0,
+    dataFile="",
     printInstances = FALSE ,
-    wrapTextWidth =80L,
+    wrapTextWidth=0,
     #ctor
-    initialize = function(showOriginal,
-                          extractedTextLength,
-                          instancesToShow,
+    initialize = function(showOriginal =FALSE,
+                          extractedTextLength=200L,
+                          instancesToShow=100L,
                           dataFile,
-
-                          wrapTextWidth) {
+                          wrapTextWidth=0) {
       self$showOriginal = showOriginal
       self$extractedTextLength = extractedTextLength
       self$instancesToShow = instancesToShow
@@ -173,38 +172,7 @@ Report <- R6Class(
       return(private$patientDateOfBirth)
     },
     
-    printStringSearchInstances= function(title,instanceCollection, searchString){
-          
-          p<-private
-          o<-p$obfuscateR
-          
-          writeLines(paste0(
-            basename(p$reportParams$dataFile),
-            "\t",
-            title
-          ))
-          
-          if (nrow(instanceCollection) > 0)
-            for (i in 1:nrow(instanceCollection)) {
-              writeLines("")
-              row <- instanceCollection[i, ]
-              
-              
-              if(reportParams$showOriginal==TRUE)
-              {
-                writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
-                writeLines(strwrap(row$extractedtext, width=private$reportParams$wrapTextWidth))
-              }
-              
-          
-              writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
-              writeLines(strwrap(row$obfuscatedtext, width=private$reportParams$wrapTextWidth))
-              
-            }
-         self$NL()
-        }
-       
-       ,
+    
     
     
     
@@ -249,16 +217,14 @@ Report <- R6Class(
       
       
       p<-private
-      o<-p$obfuscateR
-
+    
+      private$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
       
-      self$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
+      private$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
       
-      self$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
+      private$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
       
-      self$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
-      
-      self$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
+      private$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
       
       
       self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
@@ -311,7 +277,49 @@ Report <- R6Class(
         } 
       }
       return(collection)
+    },
+    printStringSearchRow=function(row){
+      
+      if(reportParams$showOriginal==TRUE)
+      {
+        writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
+        if(private$reportParams$wrapTextWidth>0)
+        {
+          writeLines(strwrap(row$extractedtext, width=private$reportParams$wrapTextWidth))
+        }
+        else{
+          writeLines(row$extractedtext)
+        }
+      }
+      
+      writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
+      
+      if(private$reportParams$wrapTextWidth>0){
+        writeLines(strwrap(row$obfuscatedtext, width=private$reportParams$wrapTextWidth))
+      }
+      else{
+        writeLines(row$obfuscatedtext)
+      }
+      
+    },
+    
+    printStringSearchInstances= function(title,instanceCollection, searchString){
+      
+      writeLines(paste0(
+        basename(private$reportParams$dataFile),
+        "\t",
+        title
+      ))
+      
+      if (nrow(instanceCollection) > 0)
+        for (i in 1:nrow(instanceCollection)) {
+        private$printStringSearchRow(instanceCollection[i, ])
+        }
+      self$NL()
     }
+    
+    
+    
     
   )
 )
