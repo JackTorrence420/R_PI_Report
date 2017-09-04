@@ -49,7 +49,7 @@ Report <- R6Class(
       
       private$reportParams = reportParams
       private$rdata = Data$new(dataFile = private$reportParams$dataFile)
-      private$obfuscateR = ObfuscateR$new(private$reportParams)
+      private$obfuscateR = ObfuscateR$new()
       
       
       #populate collections
@@ -104,7 +104,7 @@ Report <- R6Class(
       private$printLength("Patient Identifiers:  ", private$patientIdentifiers)
       private$printLength("Surgical Numbers:     ", private$surgicalNumbers)
       private$printLength("Name Changes:         ", private$patientNameChanges)
-      private$printLength("PAtient Age Over Max: ", private$patientAgeOverMax)
+      private$printLength("Patient Age Over Max: ", private$patientAgeOverMax)
       private$printLength("Date Of Birth:        ", private$patientDateOfBirth)
       private$printLength("Validated Zip Codes:  ", private$validatedZipCodes)
       private$printLength("Patient Draw Dates:   ", private$validPatDrawDates)
@@ -146,9 +146,7 @@ Report <- R6Class(
     }
     ,
     
-    #these functions provide  data to the krittr based reports
-    
-    
+    #these functions expose  data for knittr
     ShowTotalsdt = function() {
       return(data.table(
         "type" = c(
@@ -250,7 +248,10 @@ Report <- R6Class(
         collection["extractedtext"] <- NA
         for (i in 1:nrow(collection)) {
           collection[i, "extractedtext"] <-
-            private$obfuscateR$extractStringUsingPattern(pattern, collection[i, "resultmessage"])
+            private$obfuscateR$extractStringUsingPattern(
+              pattern, 
+              collection[i, "resultmessage"], 
+              private$reportParams$extractedTextLength)
           
           collection[i, "obfuscatedtext"] <-
             private$obfuscateR$obfuscateString(collection[i, "extractedtext"])

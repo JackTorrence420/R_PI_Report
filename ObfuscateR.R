@@ -7,8 +7,8 @@ ObfuscateR <- R6Class(
   "ObfuscateR",
   public = list(
     #ctor
-    initialize = function(reportParams) {
-      private$reportParams = reportParams
+    initialize = function() {
+      
       
       
       ##load dictionary data
@@ -47,11 +47,11 @@ ObfuscateR <- R6Class(
       
     },
     #extract a substring from text based on first found position of pattern
-    extractStringUsingPattern = function(pattern, text) {
+    extractStringUsingPattern = function(pattern, text, extractedTextLength) {
       pos = regexpr(pattern, text)
       rowchar <- as.character(text)
       
-      for (i in 1:private$reportParams$extractedTextLength)
+      for (i in 1:extractedTextLength)
         rowchar <- paste0(rowchar, ' ')
       
       #extract text from start of identifier
@@ -59,7 +59,7 @@ ObfuscateR <- R6Class(
         substr(
           rowchar,
           as.integer(pos[1]),
-          as.integer(pos[1]) + private$reportParams$extractedTextLength
+          as.integer(pos[1]) + extractedTextLength
         )
       
       return (tolower(rowchar))
@@ -136,7 +136,6 @@ ObfuscateR <- R6Class(
     first.female = NA,
     last.names = NA,
     exceptions = NA,
-    reportParams = NA,
     word.vec = NA,
     unigrams = function(text) {
       word.vec <- strsplit(text, "\\s+")[[1]]
