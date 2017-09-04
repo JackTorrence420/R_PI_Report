@@ -57,13 +57,13 @@ ObfuscateR <- R6Class(
         
         if(reportParams$showOriginal==TRUE)
         {
-          writeLines(paste0(" Row:",as.integer(row$rownumber)+1), " Original")
-          writeLines(strwrap(rowchar, width=private$reportParams$wrapTextWidth))
+          writeLines(paste0(" Row:",as.integer(row$rownumber)+1, " Original"))
+          writeLines(strwrap(rowChar, width=private$reportParams$wrapTextWidth))
         }
         
         
         rowChar<-self$obfuscateString(rowChar)
-        #obfuscate all number
+        
         
         writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
         writeLines(strwrap(rowChar, width=private$reportParams$wrapTextWidth))
