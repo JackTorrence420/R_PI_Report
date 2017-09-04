@@ -36,6 +36,9 @@ Data <- R6Class(
       #populate cleanZipCodes Column
       private$cleanZipCodes()
       
+      #normalize PatientAge Column
+      private$normalizePatientAge
+      
       
       #check for unambiguous patient draw dates
       private$checkForUnambiguousPatientDrawDates()
@@ -66,6 +69,8 @@ Data <- R6Class(
       
       selected_rows <-
         subset(private$documentDf,  patientage > private$maxReportableAge)
+      
+       selected_rows$patientage<-as.character(selected_rows$patientage)
       private$returnRowSet(selected_rows)
       
     },
@@ -104,6 +109,12 @@ Data <- R6Class(
     
     replaceProblematicSymbols=function(){
       private$documentDf$resultmessage <- gsub('-', '_', private$documentDf$resultmessage)
+    },
+    
+    normalizePatientAge=function(){
+      if ("patientage" %in% colnames(private$documentDf))
+        private$documentDf$patientage <- as.integer(as.character(private$documentDf$patientage))
+      
     },
     
     normalizeColumnNames = function() {

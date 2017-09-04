@@ -57,7 +57,7 @@ ObfuscateR <- R6Class(
         
         if(reportParams$showOriginal==TRUE)
         {
-          writeLines(paste0(" Row:",as.integer(row$rownumber)+1, " Original"))
+          writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
           writeLines(strwrap(rowChar, width=private$reportParams$wrapTextWidth))
         }
         

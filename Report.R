@@ -14,7 +14,7 @@ ReportParameters <- R6Class(
     instancesToShow = 100L,
     dataFile = "",
     printInstances = FALSE ,
-    wrapTextWidth =80,
+    wrapTextWidth =80L,
     #ctor
     initialize = function(showOriginal,
                           extractedTextLength,
