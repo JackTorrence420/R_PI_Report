@@ -1,6 +1,7 @@
 
 
 
+
 source("Data.r")
 source("ObfuscateR.r")
 
@@ -9,23 +10,23 @@ source("ObfuscateR.r")
 ReportParameters <- R6Class(
   "ReportParameters",
   public = list(
-    showOriginal=FALSE,
-    extractedTextLength=0,
-    instancesToShow=0,
-    dataFile="",
+    showOriginal = FALSE,
+    extractedTextLength = 0,
+    instancesToShow = 0,
+    dataFile = "",
     printInstances = FALSE ,
-    wrapTextWidth=0,
+    wrapTextWidth = 0,
     #ctor
-    initialize = function(showOriginal =FALSE,
-                          extractedTextLength=200L,
-                          instancesToShow=100L,
+    initialize = function(showOriginal = FALSE,
+                          extractedTextLength = 200L,
+                          instancesToShow = 100L,
                           dataFile,
-                          wrapTextWidth=0) {
+                          wrapTextWidth = 0) {
       self$showOriginal = showOriginal
       self$extractedTextLength = extractedTextLength
       self$instancesToShow = instancesToShow
       self$dataFile = dataFile
-      self$wrapTextWidth=wrapTextWidth
+      self$wrapTextWidth = wrapTextWidth
       
     }
     
@@ -48,14 +49,14 @@ Report <- R6Class(
       
       private$reportParams = reportParams
       private$rdata = Data$new(dataFile = private$reportParams$dataFile)
-      private$obfuscateR= ObfuscateR$new(private$reportParams)
+      private$obfuscateR = ObfuscateR$new(private$reportParams)
       
       
       #populate collections
       private$patientAgeOverMax <- private$rdata$overMaxAge()
       private$patientIdentifiers <-
         private$rdata$searchBlobColumn(private$PATIENT_ID_PATTERN)
-     
+      
       
       private$surgicalNumbers <-
         private$rdata$searchBlobColumn(private$SURGICAL_NUMBER_PATTERN)
@@ -69,25 +70,29 @@ Report <- R6Class(
       
       
       #prepare collections for reporting
-    
-      private$surgicalNumbers<-private$obfuscateCollection(private$surgicalNumbers,private$SURGICAL_NUMBER_PATTERN)
       
-      private$patientIdentifiers<-private$obfuscateCollection(private$patientIdentifiers,private$PATIENT_ID_PATTERN)
+      private$surgicalNumbers <-
+        private$obfuscateCollection(private$surgicalNumbers, private$SURGICAL_NUMBER_PATTERN)
       
-      private$patientNameChanges<-private$obfuscateCollection(private$patientNameChanges,private$NAME_CHANGED_PATTERN)
+      private$patientIdentifiers <-
+        private$obfuscateCollection(private$patientIdentifiers, private$PATIENT_ID_PATTERN)
       
-      private$patientDateOfBirth<-private$obfuscateCollection(private$patientDateOfBirth,private$DATE_OF_BIRTH_PATTERN)
+      private$patientNameChanges <-
+        private$obfuscateCollection(private$patientNameChanges, private$NAME_CHANGED_PATTERN)
+      
+      private$patientDateOfBirth <-
+        private$obfuscateCollection(private$patientDateOfBirth, private$DATE_OF_BIRTH_PATTERN)
       
       
-
-    
+      
+      
     }
-   
+    
     ,
     #print text titles for simple report
     printTitle = function() {
-      writeLines(paste0("Data Source File:      ","\t\t", basename(reportParams$dataFile)))
-      writeLines(paste0("Rows in Dataset:       ","\t\t", private$rdata$totalRows()))
+      writeLines(paste0("Data Source File:      ", "\t\t", basename(reportParams$dataFile)))
+      writeLines(paste0("Rows in Dataset:       ", "\t\t", private$rdata$totalRows()))
       private$NL()
     }
     #
@@ -95,7 +100,7 @@ Report <- R6Class(
     #print text totals for simple report
     printTotals = function() {
       writeLines("Found PHI Totals:")
-     
+      
       private$printLength("Patient Identifiers:  ", private$patientIdentifiers)
       private$printLength("Surgical Numbers:     ", private$surgicalNumbers)
       private$printLength("Name Changes:         ", private$patientNameChanges)
@@ -110,24 +115,33 @@ Report <- R6Class(
     
     #print instances for the text based report
     printExamples = function() {
+      p <- private
+      
+      p$printStringSearchInstances("Patient Id Instances:", p$patientIdentifiers)
+      
+      p$printStringSearchInstances("Name Change Instances:", p$patientNameChanges)
+      
+      p$printStringSearchInstances("Surgical Number Instances:", p$surgicalNumbers)
+      
+      p$printStringSearchInstances("Date Of Birth Instances", p$patientDateOfBirth)
       
       
-      p<-private
+      p$printFieldInstances("Sample Patient Age Over Max Instances:",
+                            p$patientAgeOverMax,
+                            "patientage" ,
+                            "Age:")
       
-      p$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers)
+      p$printFieldInstances("Sample Zip Code Instances:",
+                            p$validatedZipCodes,
+                            "cleanzipcodes",
+                            "Zip:")
       
-      p$printStringSearchInstances("Name Change Instances:",p$patientNameChanges)
-      
-      p$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers)
-      
-      p$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth)
-      
-      
-      p$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
-      
-      p$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
-      
-      p$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )
+      p$printFieldInstances(
+        "Sample Patient Draw Date Instances:",
+        p$validPatDrawDates,
+        "patientdrawdate",
+        "Patient Draw Date:"
+      )
       
     }
     ,
@@ -135,69 +149,74 @@ Report <- R6Class(
     #these functions provide  data to the krittr based reports
     
     
-    ShowTotalsdt=function(){
-      
-      return(data.table("type" = c("Total Records:","Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:"
-                                   ,"Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
-                        "total" = c(
-                          private$rdata$totalRows(),
-                          nrow(private$patientIdentifiers),
-                          nrow(private$surgicalNumbers),
-                          nrow(private$patientNameChanges),
-                          nrow(private$patientAgeOverMax),
-                          nrow(private$patientDateOfBirth),
-                          nrow(private$validatedZipCodes),
-                          nrow(private$validPatDrawDates)
-                        )  
-      )
-      )
+    ShowTotalsdt = function() {
+      return(data.table(
+        "type" = c(
+          "Total Records:",
+          "Patient Identifiers:",
+          "Surgical Numbers:",
+          "Name Changes:",
+          "Patient Age Over Max:"
+          ,
+          "Date Of Birth:",
+          "Validated Zip Codes:",
+          "Patient Draw Dates:"
+        ),
+        "total" = c(
+          private$rdata$totalRows(),
+          nrow(private$patientIdentifiers),
+          nrow(private$surgicalNumbers),
+          nrow(private$patientNameChanges),
+          nrow(private$patientAgeOverMax),
+          nrow(private$patientDateOfBirth),
+          nrow(private$validatedZipCodes),
+          nrow(private$validPatDrawDates)
+        )
+      ))
     }
     ,
     
     
     
     
-    getPatDates=function(){
-      
-      colnames(private$validPatDrawDates)[colnames(private$validPatDrawDates)=="patientdrawdate"] <- "patient draw date"
+    getPatDates = function() {
+      colnames(private$validPatDrawDates)[colnames(private$validPatDrawDates) ==
+                                            "patientdrawdate"] <- "patient draw date"
       return(private$validPatDrawDates)
     },
     
-    getValidZipCodes=function(){
-      
-      colnames(private$validatedZipCodes)[colnames(private$validatedZipCodes)=="cleanzipcodes"] <- "patient address postal code"
+    getValidZipCodes = function() {
+      colnames(private$validatedZipCodes)[colnames(private$validatedZipCodes) ==
+                                            "cleanzipcodes"] <- "patient address postal code"
       
       return(private$validatedZipCodes)
     },
     
-    getPatAgeOverMax=function(){
-      colnames(private$patientAgeOverMax)[colnames(private$patientAgeOverMax)=="patientage"] <- "patient age over max"
+    getPatAgeOverMax = function() {
+      colnames(private$patientAgeOverMax)[colnames(private$patientAgeOverMax) ==
+                                            "patientage"] <- "patient age over max"
       
       return(private$patientAgeOverMax)
     },
     
-    getSurgicalNumbers=function(){
-      
+    getSurgicalNumbers = function() {
       return(private$surgicalNumbers)
     },
     
-    getPatientIdentifiers=function(){
-      
+    getPatientIdentifiers = function() {
       return(private$patientIdentifiers)
     },
     
     
-    getNameChanges=function(){
-      
+    getNameChanges = function() {
       return(private$patientNameChanges)
     },
     
-    getpatientDateOfBirth=function(){
-      
+    getpatientDateOfBirth = function() {
       return(private$patientDateOfBirth)
     }
     
-   
+    
     
     
   )
@@ -205,7 +224,7 @@ Report <- R6Class(
   ,
   private = list(
     rdata = NULL,
-    obfuscateR=NULL,
+    obfuscateR = NULL,
     reportParams = NULL,
     patientAgeOverMax = NULL,
     patientIdentifiers = NULL,
@@ -225,41 +244,39 @@ Report <- R6Class(
     },
     
     #prepare collection  for report by removing names and digits from resultmessage field
-    obfuscateCollection=function(collection, pattern){
-      if(nrow(collection)>0){
-        collection["obfuscatedtext"]<-NA
-        collection["extractedtext"]<-NA
-        for(i in 1:nrow(collection)) {
+    obfuscateCollection = function(collection, pattern) {
+      if (nrow(collection) > 0) {
+        collection["obfuscatedtext"] <- NA
+        collection["extractedtext"] <- NA
+        for (i in 1:nrow(collection)) {
+          collection[i, "extractedtext"] <-
+            private$obfuscateR$extractStringUsingPattern(pattern, collection[i, "resultmessage"])
           
-          collection[i,"extractedtext"]<-
-            private$obfuscateR$extractStringUsingPattern(pattern, collection[i,"resultmessage"])
+          collection[i, "obfuscatedtext"] <-
+            private$obfuscateR$obfuscateString(collection[i, "extractedtext"])
           
-          collection[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(collection[i,"extractedtext"])
           
-        
-        } 
+        }
       }
       return(collection)
     },
-    printStringSearchRow=function(row){
-      
-      if(reportParams$showOriginal==TRUE)
+    printStringSearchRow = function(row) {
+      if (reportParams$showOriginal == TRUE)
       {
-        writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
-        if(private$reportParams$wrapTextWidth>0)
+        writeLines(paste0("Row:", as.integer(row$rownumber) + 1, " Original"))
+        if (private$reportParams$wrapTextWidth > 0)
         {
-          writeLines(strwrap(row$extractedtext, width=private$reportParams$wrapTextWidth))
+          writeLines(strwrap(row$extractedtext, width = private$reportParams$wrapTextWidth))
         }
         else{
           writeLines(row$extractedtext)
         }
       }
       
-      writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
+      writeLines(paste0("Row:", as.integer(row$rownumber) + 1 , " Obfuscated"))
       
-      if(private$reportParams$wrapTextWidth>0){
-        writeLines(strwrap(row$obfuscatedtext, width=private$reportParams$wrapTextWidth))
+      if (private$reportParams$wrapTextWidth > 0) {
+        writeLines(strwrap(row$obfuscatedtext, width = private$reportParams$wrapTextWidth))
       }
       else{
         writeLines(row$obfuscatedtext)
@@ -267,34 +284,31 @@ Report <- R6Class(
       
     },
     
-    printStringSearchInstances= function(title,instanceCollection){
-      
-      writeLines(paste0(
-        basename(private$reportParams$dataFile),
-        "\t",
-        title
-      ))
+    printStringSearchInstances = function(title, instanceCollection) {
+      writeLines(paste0(basename(private$reportParams$dataFile),
+                        "\t",
+                        title))
       
       if (nrow(instanceCollection) > 0)
         for (i in 1:nrow(instanceCollection)) {
-        private$printStringSearchRow(instanceCollection[i, ])
+          private$printStringSearchRow(instanceCollection[i,])
         }
       private$NL()
     },
-   
-     #For simple Report. Print lines to represent non string search field counts
-    printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
-      
+    
+    #For simple Report. Print lines to represent non string search field counts
+    printFieldInstances = function(title,
+                                   instanceCollection,
+                                   columnName,
+                                   rowDecorator) {
       private$NL()
       if (nrow(instanceCollection) > 0) {
-        writeLines(paste0(
-          basename(private$reportParams$dataFile),
-          "\t",
-          title
-        ))
+        writeLines(paste0(basename(private$reportParams$dataFile),
+                          "\t",
+                          title))
         private$NL()
         for (i in 1:nrow(head(instanceCollection, n = private$reportParams$instancesToShow))) {
-          row <- instanceCollection[i, ]
+          row <- instanceCollection[i,]
           writeLines(paste0(
             "Row:",
             "\t",
@@ -326,6 +340,3 @@ Report <- R6Class(
     
   )
 )
-
-
-

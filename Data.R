@@ -52,7 +52,7 @@ Data <- R6Class(
       
       ndx <-
         grep(pattern, private$documentDf$resultmessage)
-      selected_rows <- private$documentDf[ndx, ]
+      selected_rows <- private$documentDf[ndx,]
       private$returnRowSet(selected_rows)
     },
     
@@ -63,31 +63,32 @@ Data <- R6Class(
     
     overMaxAge = function()
     {
-      
       if (!("patientage" %in% colnames(private$documentDf)))
         stop("No patientage column in document")
       
       selected_rows <-
         subset(private$documentDf,  patientage > private$maxReportableAge)
       
-       selected_rows$patientage<-as.character(selected_rows$patientage)
+      selected_rows$patientage <-
+        as.character(selected_rows$patientage)
       private$returnRowSet(selected_rows)
       
     },
     validPatientDrawDates = function()
     {
       selected_rows <-
-        private$documentDf[!is.na(private$documentDf$patientdrawdate), ]
+        private$documentDf[!is.na(private$documentDf$patientdrawdate),]
       
-      if(nrow(selected_rows)>0)
-        selected_rows$patientdrawdate <-as.character(as.Date(selected_rows$patientdrawdate ,format = '%m/%d/%Y'))
-        
+      if (nrow(selected_rows) > 0)
+        selected_rows$patientdrawdate <-
+          as.character(as.Date(selected_rows$patientdrawdate , format = '%m/%d/%Y'))
+      
       private$returnRowSet(selected_rows)
     },
     
     validZipCodes = function() {
       selected_rows <-
-        private$documentDf[!is.na(private$documentDf$cleanzipcodes), ]
+        private$documentDf[!is.na(private$documentDf$cleanzipcodes),]
       private$returnRowSet(selected_rows)
       
     }
@@ -107,13 +108,15 @@ Data <- R6Class(
       
     },
     
-    replaceProblematicSymbols=function(){
-      private$documentDf$resultmessage <- gsub('-', '_', private$documentDf$resultmessage)
+    replaceProblematicSymbols = function() {
+      private$documentDf$resultmessage <-
+        gsub('-', '_', private$documentDf$resultmessage)
     },
     
-    normalizePatientAge=function(){
+    normalizePatientAge = function() {
       if ("patientage" %in% colnames(private$documentDf))
-        private$documentDf$patientage <- as.integer(as.character(private$documentDf$patientage))
+        private$documentDf$patientage <-
+          as.integer(as.character(private$documentDf$patientage))
       
     },
     
@@ -133,8 +136,6 @@ Data <- R6Class(
       
     },
     normalizePostalCodeColumns = function() {
-      
-      
       if ("patientaddresspostalcodezipcode" %in% colnames(private$documentDf))
         names(private$documentDf)[names(private$documentDf) == 'patientaddresspostalcodezipcode'] <-
           'patientaddresspostalcode'
@@ -186,7 +187,7 @@ Data <- R6Class(
       if (nrow(selected_rows) > 0)
         return (selected_rows)
       else
-        return(private$documentDf[FALSE, ])
+        return(private$documentDf[FALSE,])
       
     }
     
