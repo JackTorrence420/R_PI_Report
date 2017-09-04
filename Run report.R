@@ -1,6 +1,14 @@
+
+
+#install required packages
+list.of.packages <- c("tm", "R6","anytime", "zipcode")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+
 source("Report.r")
 
-#sink writes out the report
+#create a report file in the current directory
 sink(paste0(sub('\\..*', '', 'PIReport'), format(Sys.time(),'_%Y%m%d_%H%M%S'), '.txt'))
 
 
