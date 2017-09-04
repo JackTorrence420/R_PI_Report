@@ -111,27 +111,56 @@ Report <- R6Class(
       self$NL()
     }
     ,
+    
+    #print instances for the text based report
+    printExamples = function() {
+      
+      
+      p<-private
+      
+      p$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
+      
+      p$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
+      
+      p$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
+      
+      p$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
+      
+      
+      p$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
+      
+      p$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
+      
+      p$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )
+      
+    }
+    ,
+    
+    #these functions provide  data to the krittr based reports
+    
+    
     ShowTotalsdt=function(){
       
       return(data.table("type" = c("Total Records:","Patient Identifiers:","Surgical Numbers:","Name Changes:","Patient Age Over Max:"
-                                  ,"Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
-                      "total" = c(
-                                 private$rdata$totalRows(),
-                                 nrow(private$patientIdentifiers),
-                                 nrow(private$surgicalNumbers),
-                                 nrow(private$patientNameChanges),
-                                 nrow(private$patientAgeOverMax),
-                                 nrow(private$patientDateOfBirth),
-                                 nrow(private$validatedZipCodes),
-                                 nrow(private$validPatDrawDates)
-                                )  
-                      )
-            )
+                                   ,"Date Of Birth:","Validated Zip Codes:","Patient Draw Dates:"),
+                        "total" = c(
+                          private$rdata$totalRows(),
+                          nrow(private$patientIdentifiers),
+                          nrow(private$surgicalNumbers),
+                          nrow(private$patientNameChanges),
+                          nrow(private$patientAgeOverMax),
+                          nrow(private$patientDateOfBirth),
+                          nrow(private$validatedZipCodes),
+                          nrow(private$validPatDrawDates)
+                        )  
+      )
+      )
     }
-    
-
     ,
-    #these functions provide  data to the krittr based reports
+    
+    
+    
+    
     getPatDates=function(){
       
       colnames(private$validPatDrawDates)[colnames(private$validPatDrawDates)=="patientdrawdate"] <- "patient draw date"
@@ -170,70 +199,9 @@ Report <- R6Class(
     getpatientDateOfBirth=function(){
       
       return(private$patientDateOfBirth)
-    },
-    
-    
-    
-    
-    
-    
-    
-    #For simple Report. Print lines to represent non string search field counts
-    printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
-      
-      self$NL()
-      if (nrow(instanceCollection) > 0) {
-        writeLines(paste0(
-          basename(private$reportParams$dataFile),
-          "\t",
-          title
-        ))
-        self$NL()
-        for (i in 1:nrow(head(instanceCollection, n = private$reportParams$instancesToShow))) {
-          row <- instanceCollection[i, ]
-          writeLines(paste0(
-            "Row:",
-            "\t",
-            format(paste0(as.character(
-              as.integer(row$rownumber) + 1
-            ), " "), justify = "right"),
-            "\t\t",
-            rowDecorator,
-            "\t",
-            row[columnName]
-          ))
-        }
-        
-        
-      }
-      
-      self$NL()
-      
     }
     
-    ,
-    
-    printExamples = function() {
-      
-      
-      p<-private
-    
-      private$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
-      
-      private$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
-      
-      private$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
-      
-      private$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
-      
-      
-      self$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
-    
-      self$printFieldInstances("Sample Zip Code Instances:",p$validatedZipCodes, "cleanzipcodes", "Zip:" )
-      
-      self$printFieldInstances("Sample Patient Draw Date Instances:",p$validPatDrawDates, "patientdrawdate", "Patient Draw Date:" )
-      
-    }
+   
     
     
   )
@@ -316,7 +284,42 @@ Report <- R6Class(
         private$printStringSearchRow(instanceCollection[i, ])
         }
       self$NL()
+    },
+   
+     #For simple Report. Print lines to represent non string search field counts
+    printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
+      
+      self$NL()
+      if (nrow(instanceCollection) > 0) {
+        writeLines(paste0(
+          basename(private$reportParams$dataFile),
+          "\t",
+          title
+        ))
+        self$NL()
+        for (i in 1:nrow(head(instanceCollection, n = private$reportParams$instancesToShow))) {
+          row <- instanceCollection[i, ]
+          writeLines(paste0(
+            "Row:",
+            "\t",
+            format(paste0(as.character(
+              as.integer(row$rownumber) + 1
+            ), " "), justify = "right"),
+            "\t\t",
+            rowDecorator,
+            "\t",
+            row[columnName]
+          ))
+        }
+        
+        
+      }
+      
+      self$NL()
+      
     }
+    
+    
     
     
     
