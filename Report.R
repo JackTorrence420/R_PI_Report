@@ -20,13 +20,12 @@ ReportParameters <- R6Class(
                           extractedTextLength,
                           instancesToShow,
                           dataFile,
-                          printInstances,
+
                           wrapTextWidth) {
       self$showOriginal = showOriginal
       self$extractedTextLength = extractedTextLength
       self$instancesToShow = instancesToShow
       self$dataFile = dataFile
-      self$printInstances = printInstances
       self$wrapTextWidth=wrapTextWidth
       
     }
@@ -57,6 +56,7 @@ Report <- R6Class(
       private$patientAgeOverMax <- private$rdata$overMaxAge()
       private$patientIdentifiers <-
         private$rdata$searchBlobColumn(private$PATIENT_ID_PATTERN)
+     
       
       private$surgicalNumbers <-
         private$rdata$searchBlobColumn(private$SURGICAL_NUMBER_PATTERN)
@@ -173,24 +173,43 @@ Report <- R6Class(
       return(private$patientDateOfBirth)
     },
     
-    
-    #TODO Obfuscation already applied to collection. Simplify this function
-    #For simple report print out lines for obfuscated string search based collections
     printStringSearchInstances= function(title,instanceCollection, searchString){
-      
-      p<-private
-      o<-p$obfuscateR
-      
-      writeLines(paste0(
-        basename(p$reportParams$dataFile),
-        "\t",
-        title
-      ))
-      o$obfuscate(instanceCollection,
-                  searchString)
-      self$NL()
-    }
-    ,
+          
+          p<-private
+          o<-p$obfuscateR
+          
+          writeLines(paste0(
+            basename(p$reportParams$dataFile),
+            "\t",
+            title
+          ))
+          
+          if (nrow(instanceCollection) > 0)
+            for (i in 1:nrow(instanceCollection)) {
+              writeLines("")
+              row <- instanceCollection[i, ]
+              
+              
+              if(reportParams$showOriginal==TRUE)
+              {
+                writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
+                writeLines(strwrap(row$extractedtext, width=private$reportParams$wrapTextWidth))
+              }
+              
+          
+              writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
+              writeLines(strwrap(row$obfuscatedtext, width=private$reportParams$wrapTextWidth))
+              
+            }
+         self$NL()
+        }
+       
+       ,
+    
+    
+    
+    
+    
     #For simple Report. Print lines to represent non string search field counts
     printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
       
@@ -279,9 +298,14 @@ Report <- R6Class(
     obfuscateCollection=function(collection, pattern){
       if(nrow(collection)>0){
         collection["obfuscatedtext"]<-NA
+        collection["extractedtext"]<-NA
         for(i in 1:nrow(collection)) {
+          
+          collection[i,"extractedtext"]<-
+            private$obfuscateR$extractStringUsingPattern(pattern, collection[i,"resultmessage"])
+          
           collection[i,"obfuscatedtext"]<-
-            private$obfuscateR$obfuscateString(private$obfuscateR$extractStringUsingPattern(pattern, collection[i,"resultmessage"]))
+            private$obfuscateR$obfuscateString(collection[i,"extractedtext"])
           
         
         } 

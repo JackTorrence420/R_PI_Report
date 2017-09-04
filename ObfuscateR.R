@@ -41,49 +41,11 @@ ObfuscateR <- R6Class(
     
     
   },
-  ##print out result message text 
-  obfuscate= function(instanceCollection, pattern) {
-    
-    instanceCollection <- head(as.data.frame(instanceCollection),n = private$reportParams$instancesToShow)
-    rowCount <-  nrow(instanceCollection)
-    writeLines(paste0("Instances to process: ", "\t", rowCount))
-    
-    if (rowCount > 0)
-      for (i in 1:nrow(instanceCollection)) {
-        writeLines("")
-        row <- instanceCollection[i, ]
-        
-        rowChar<-self$extractStringUsingPattern(pattern, row$resultmessage)
-        
-        if(reportParams$showOriginal==TRUE)
-        {
-          writeLines(paste0("Row:",as.integer(row$rownumber)+1, " Original"))
-          writeLines(strwrap(rowChar, width=private$reportParams$wrapTextWidth))
-        }
-        
-        
-        rowChar<-self$obfuscateString(rowChar)
-        
-        
-        writeLines(paste0("Row:",as.integer(row$rownumber)+1 , " Obfuscated"))
-        writeLines(strwrap(rowChar, width=private$reportParams$wrapTextWidth))
-        
-      }
-    writeLines("")
-    
-    
-  },
-  
+ #extract a substring from text based on first found position of pattern 
  extractStringUsingPattern= function(pattern, text){
     
- 
-   
-   
-   
    pos = regexpr(pattern, text)
     rowchar <- as.character(text)
-    
-   
     
     for (i in 1:private$reportParams$extractedTextLength)
       rowchar <- paste0(rowchar, ' ')
@@ -92,12 +54,11 @@ ObfuscateR <- R6Class(
     rowchar <-
       substr(rowchar, as.integer(pos[1]), as.integer(pos[1]) + private$reportParams$extractedTextLength)
    
-    
-  
     return (tolower(rowchar))
   }
   ,
   
+  #replace digits and person names with a # 
   obfuscateString=function(text){
     
     possibleEntities = lapply(text, self$get.any.names)
