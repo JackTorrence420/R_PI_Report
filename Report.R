@@ -82,17 +82,13 @@ Report <- R6Class(
 
     
     }
-    ,
-    NL = function() {
-      writeLines("")
-    }
-    
+   
     ,
     #print text titles for simple report
     printTitle = function() {
       writeLines(paste0("Data Source File:      ","\t\t", basename(reportParams$dataFile)))
       writeLines(paste0("Rows in Dataset:       ","\t\t", private$rdata$totalRows()))
-      self$NL()
+      private$NL()
     }
     #
     ,
@@ -108,7 +104,7 @@ Report <- R6Class(
       private$printLength("Validated Zip Codes:  ", private$validatedZipCodes)
       private$printLength("Patient Draw Dates:   ", private$validPatDrawDates)
       
-      self$NL()
+      private$NL()
     }
     ,
     
@@ -118,13 +114,13 @@ Report <- R6Class(
       
       p<-private
       
-      p$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers, p$PATIENT_ID_PATTERN)
+      p$printStringSearchInstances("Patient Id Instances:",p$patientIdentifiers)
       
-      p$printStringSearchInstances("Name Change Instances:",p$patientNameChanges, p$NAME_CHANGED_PATTERN)
+      p$printStringSearchInstances("Name Change Instances:",p$patientNameChanges)
       
-      p$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers, p$SURGICAL_NUMBER_PATTERN)
+      p$printStringSearchInstances("Surgical Number Instances:",p$surgicalNumbers)
       
-      p$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth, p$DATE_OF_BIRTH_PATTERN)
+      p$printStringSearchInstances("Date Of Birth Instances",p$patientDateOfBirth)
       
       
       p$printFieldInstances("Sample Patient Age Over Max Instances:",p$patientAgeOverMax, "patientage" ,"Age:")
@@ -271,7 +267,7 @@ Report <- R6Class(
       
     },
     
-    printStringSearchInstances= function(title,instanceCollection, searchString){
+    printStringSearchInstances= function(title,instanceCollection){
       
       writeLines(paste0(
         basename(private$reportParams$dataFile),
@@ -283,20 +279,20 @@ Report <- R6Class(
         for (i in 1:nrow(instanceCollection)) {
         private$printStringSearchRow(instanceCollection[i, ])
         }
-      self$NL()
+      private$NL()
     },
    
      #For simple Report. Print lines to represent non string search field counts
     printFieldInstances=function(title, instanceCollection, columnName, rowDecorator){
       
-      self$NL()
+      private$NL()
       if (nrow(instanceCollection) > 0) {
         writeLines(paste0(
           basename(private$reportParams$dataFile),
           "\t",
           title
         ))
-        self$NL()
+        private$NL()
         for (i in 1:nrow(head(instanceCollection, n = private$reportParams$instancesToShow))) {
           row <- instanceCollection[i, ]
           writeLines(paste0(
@@ -315,8 +311,12 @@ Report <- R6Class(
         
       }
       
-      self$NL()
+      private$NL()
       
+    }
+    ,
+    NL = function() {
+      writeLines("")
     }
     
     
