@@ -16,14 +16,19 @@ Data <- R6Class(
       
       
       #populate dataframe
+      #private$documentDf <- read.csv(dataFile,quote="",row.names=NULL)
+      #private$documentDf <- read.csv(dataFile,header=TRUE,quote="",sep=",")
       private$documentDf <- read.csv(dataFile)
-      
-      
       
       
       #add RowNumber
       private$addRowNumber()
       
+      
+      
+      
+      
+      #print(head(private$documentDf))
       #normalize ColNames
       private$normalizeColumnNames()
       
@@ -106,11 +111,15 @@ Data <- R6Class(
         seq.int(nrow(private$documentDf))
       
       
+      private$documentDf$RowNumber<-private$documentDf$RowNumber+1
+      private$documentDf$RowNumber<-as.character(private$documentDf$RowNumber)
+      
     },
     
     replaceProblematicSymbols = function() {
       private$documentDf$resultmessage <-
         gsub('-', '_', private$documentDf$resultmessage)
+     
     },
     
     normalizePatientAge = function() {

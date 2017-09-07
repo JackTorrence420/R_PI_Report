@@ -235,6 +235,9 @@ Report <- R6Class(
     NAME_CHANGED_PATTERN = 'name changed',
     SURGICAL_NUMBER_PATTERN = 'SURGICAL #',
     DATE_OF_BIRTH_PATTERN = 'date of birth',
+
+    
+    
     
     printLength = function(instancename, instance)
     {
@@ -264,7 +267,7 @@ Report <- R6Class(
     printStringSearchRow = function(row) {
       if (reportParams$showOriginal == TRUE)
       {
-        writeLines(paste0("Row:", as.integer(row$rownumber) + 1, " Original"))
+        writeLines(paste0("Row:", as.integer(row$rownumber), " Original"))
         if (private$reportParams$wrapTextWidth > 0)
         {
           writeLines(strwrap(row$extractedtext, width = private$reportParams$wrapTextWidth))
@@ -274,7 +277,7 @@ Report <- R6Class(
         }
       }
       
-      writeLines(paste0("Row:", as.integer(row$rownumber) + 1 , " Obfuscated"))
+      writeLines(paste0("Row:", as.integer(row$rownumber) , " Obfuscated"))
       
       if (private$reportParams$wrapTextWidth > 0) {
         writeLines(strwrap(row$obfuscatedtext, width = private$reportParams$wrapTextWidth))
